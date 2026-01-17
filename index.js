@@ -18,16 +18,15 @@ const client = new MongoClient(uri, {
     }
 });
 
-// Define your database and collections globally
 const db = client.db('WaveTone-Db');
 const productCollection = db.collection('Available-products');
 
-// 1. Root Route
+
 app.get('/', (req, res) => {
     res.send('Hello World!');
 });
 
-// 2. Products Route (Now outside the async function)
+
 app.get("/products", async (req, res) => {
     try {
         const result = await productCollection.find().toArray();
@@ -37,7 +36,7 @@ app.get("/products", async (req, res) => {
     }
 });
 
-// Simplify the connection logic for Serverless
+
 async function run() {
     try {
         // In serverless, we don't strictly need to await connect() 
