@@ -1,13 +1,11 @@
 require('dotenv').config();
-const express = require('express');
+const express = require('express')
 const { MongoClient, ServerApiVersion } = require('mongodb');
-const cors = require("cors");
-
-const app = express();
-const port = process.env.PORT || 5000;
-
-app.use(cors());
-app.use(express.json());
+const app = express()
+const port = process.env.PORT || 5000
+const cors = require("cors")
+app.use(cors())
+app.use(express.json())
 
 const uri = process.env.MONGO_URI;
 const client = new MongoClient(uri, {
@@ -18,41 +16,39 @@ const client = new MongoClient(uri, {
     }
 });
 
-const db = client.db('WaveTone-Db');
-const productCollection = db.collection('Available-products');
-
 
 app.get('/', (req, res) => {
-    res.send('Hello World!');
-});
+    res.send('Hello World!')
+})
 
-
-app.get("/products", async (req, res) => {
-    try {
-        const result = await productCollection.find().toArray();
-        res.send(result);
-    } catch (error) {
-        res.status(500).send({ message: "Error fetching products", error });
-    }
-});
 
 
 async function run() {
     try {
-        // In serverless, we don't strictly need to await connect() 
-        // as the driver handles it on the first request.
-        console.log("MongoDB connection initialized");
-    } catch (err) {
-        console.error(err);
+        // await client.connect();
+        // Send a ping to confirm a successful connection
+        const db = client.db('WaveTone-Db')
+        const productCollection = db.collection('Available-products')
+
+
+
+        //   apis starts from here
+
+        app.get("/products", async (req, res) => {
+            const result = await productCollection.find().toArray()
+            res.send(result)
+        })
+
+
+        await client.db("admin").command({ ping: 1 });
+        console.log("Pinged your deployment. You successfully connected to MongoDB!");
+    } finally {
+        // Ensures that the client will close when you finish/error
+        // await client.close();
     }
 }
 run().catch(console.dir);
 
-
-if (process.env.NODE_ENV !== 'production') {
-    app.listen(port, () => {
-        console.log(`Server running on port ${port}`);
-    });
-}
-
-module.exports = app; 
+app.listen(port, () => {
+    console.log(`Example app listening on port ${port}`)
+})
